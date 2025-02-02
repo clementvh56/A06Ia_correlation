@@ -1,0 +1,157 @@
+---
+title: "Eucalyptus et corrélation"
+author: '___'
+date: "`r Sys.Date()`"
+format:
+  html:
+    code-fold: true
+    code-tools: true
+    toc: true
+editor: visual
+lang: fr
+editor_options: 
+  chunk_output_type: inline
+---
+
+## Introduction et but
+
+Les gardes forestiers ont plusieurs missions, dont la gestion des ressources naturelles. Ils vont sélectionner judicieusement les arbres à abattre dans les parcelles qu'ils administrent. Afin d'estimer le volume de bois $v$ attendu, ils se basent généralement sur la hauteur de l'arbre $h$ et son diamètre à la base (ou son rayon $r$). On peut simplifier le tronc d'un arbre à un cône qui va donc suivre la formule :
+
+$$v = \frac{\pi r^2 h}{3}$$
+
+Le volume ($v$ en $m^3$) est la multiplication de l'aire de la base ($\pi r^2$ en $m^2$) par la hauteur ($h$ en $m$), divisée par 3.
+
+La mesure de la hauteur d'un arbre peut être déterminée grâce à un dendromètre. Cet outil mesure très précisément l'angle entre le sol et le sommet de l'arbre. Connaissant la distance à l'arbre au moment de la mesure, il est possible d'en déterminer la hauteur par application du théorème de Pythagore. Pour déterminer cet angle, il faut une vue dégagée sur la cime de l'arbre et assez de recul pour prendre une mesure précise. Il y a donc des situations où il n'est pas possible de déterminer la hauteur de l'arbre précisément.
+
+Généralement, le diamètre (ou le rayon) de l'arbre à sa base n'est pas mesurée, mais bien sa circonférence $c$ à 1,50m du sol. Le rayon est facilement obtenu à partir de cette dernière mesure comme $r = c / 2\pi$ pour permettre ensuite d'utiliser la formule ci-dessus.
+
+<!--# Nous anticipons un peu sur la partie modélisation du cours de science des données II ici. Nous y apprendrons, en effet, comment ajuster ce genre de modèle pour réaliser des prédictions. Il s'agit du second niveau d'association entre variables, mais pour l'instant, nous nous bornerons à travailler sur la corrélation (premier niveau d'association). -->
+
+Dans le calcul du volume de bois $v$, nous utiliserions donc deux variables *prédictives* $h$ et $c$. Par ailleurs, si les variables prédictives utilisées dans un modèle sont fortement corrélées entre elles, le modèle est *instable*. On parle de *multicolinéarité*.
+
+Des gardes forestiers ont réalisé une série de mesures de hauteurs et de circonférences de plus de 1400 eucalyptus. Ils souhaitent savoir si la hauteur des arbres est corrélée à leur circonférence pour déterminer si la multicolinéarité risque de poser problème dans un modèle prédictif du volume de bois.
+
+## Matériel et méthodes
+
+Les données sont mises à disposition par des gardes forestiers avec lesquels nous collaborons. Ces données ne sont pas publiques.
+
+L'analyse est réalisée avec le logiciel R (`r R.version.string`) et en particulier les packages {inferit} version `r packageVersion("inferit")` et {modelit} version `r packageVersion("modelit")` dans la [SciViews Box 2023](https://www.sciviews.org/software/svbox/). [Saturn Cloud](https://saturncloud.io/) (Linux Ubuntu 22.04) est utilisé pour exécuter le code et compiler la version HTML de ce bloc-notes.
+
+Le seuil $\alpha$ du test est fixé à l'avance à 5%.
+
+## Résultats
+
+```{r setup, include=FALSE}
+# Ceci est nécessaire pour les tests SDD, ne pas utiliser dans un "vrai" projet
+if (!"tools:tests" %in% search())
+  source(here::here("tests/tools_tests.R"), attach(NULL, name = "tools:tests"))
+
+# Configuration de l'environnement SciViews::R
+___(___, ___ = "fr")
+```
+
+### Analyse descriptive
+
+<!--% Importez le jeu de données `eucalyptus` qui se trouve dans le fichier eucalyptus.csv dans le dossier data. Utilisez ensuite la fonction `skim()` du package {skimr} pour décrire vos données. -->
+
+```{r import, record='RODFS', object='eucalyptus'}
+eucalyptus <- ___(___)
+___(eucalyptus)
+```
+
+```{r desccomment, output='asis'}
+select_answer(r"-{
+[] -   Ce jeu de données ne contient aucune valeur manquante.
+[] -   Une valeur est manquante dans ce jeu de données.
+[] -   Plusieurs valeurs sont manquantes dans ce jeu de données.
+
+[] -   Ce tableau inclut uniquement des variables numériques.
+[] -   Ce tableau comporte uniquement des variables qualitatives.
+[] -   Ce tableau contient des variables qualitatives et des variables quantitatives.}-")
+```
+
+<!--% Ajoutez des labels et des unités aux variables `ht` et `circ`uniquement. La variable `ht` sera labellisée "Hauteur" en m. La variable `circ` sera labellisée "Circonférence à 1,5m" en cm. Vous enregistrerez le jeu de données labellisé sous le nom `eucalyptus`. -->
+
+```{r labelise, record='RODFS', object='eucalyptus'}
+eucalyptus <- labelise(___,
+  label = list(___ = ___, ___ = ___),
+  units = list(___ = ___, ___ = ___)
+)
+```
+
+<!--% Réalisez un graphique adéquat pour représenter la hauteur des arbres en fonction de la circonférence. -->
+
+```{r plot, record='RNP', arg='labels'}
+___(data = ___, ___) +
+  ___
+```
+
+```{r plotcomment, output='asis'}
+select_answer(r"-{
+[] -   Le nuage de points s'étire en oblique de manière parfaitement linéaire.
+[] -   Le nuage de points s'étire en oblique de façon à peu près linéaire.
+[] -   Le nuage de points s'étire en oblique de manière non linéaire.
+[] -   Le nuage de points s'étire presque parallèlement à l'axe des abscisses.
+[] -   Le nuage de points s'étire presque parallèlement à l'axe des ordonnées.
+
+[] -   La population est homogène.
+[] -   Des sous-groupes sont visibles sur le graphique.
+  
+[] -   Aucune valeur extrême ne se détache du nuage de points.
+[] -   Une valeur extrême se détache du nuage de points.
+[] -   Plusieurs valeurs extrêmes se détachent du nuage de points.}-")
+```
+
+### Corrélation entre hauteur et circonférence
+
+La corrélation de Pearson entre hauteur et circonférence vaut :
+
+<!--% Calculez la corrélation linéaire de Pearson entre la hauteur et la circonférence des arbres en utilisant la fonction `cor()`. -->
+
+```{r corrp, record='RN'}
+___(___)
+```
+
+Le coefficient de corrélation de Spearman entre les mêmes variables est :
+
+<!--% Calculez la corrélation non linéaire de Spearman entre la hauteur et la circonférence des arbres en utilisant la fonction `cor()` pour comparaison. -->
+
+```{r corrs, record='RN'}
+___(___)
+```
+
+```{r corrcomment, output='asis'}
+select_answer(r"-{
+[] -   Les deux coefficients de corrélation sont proches l'un de l'autre, signe que le nuage de points est pratiquement linéaire.
+[] -   Les deux coefficients de corrélation sont proches l'un de l'autre, la corrélation est donc significative.
+[] -   Les deux coefficients de corrélation sont très différents l'un de l'autre. Il y a non-linéarité.
+
+[] -   Les coefficients de corrélation sont pratiquement nuls.
+[] -   Les coefficients de corrélation sont faibles.
+[] -   Les coefficients de corrélation sont moyens.
+[] -   Les coefficients de corrélation sont élevés.
+[] -   Les coefficients de corrélation sont très élevés}-")
+```
+
+Cette corrélation est-elle significative ?
+
+<!--% Effectuez un test d'hypothèse pour déterminer si la corrélation selon Pearson est significative au seuil alpha de 5%. -->
+
+```{r corrtest, record='RNP', arg='data.name,method,alternative,estimate'}
+___(data = ___, ___, alternative = ___)
+```
+
+<!-- Interprétez ce test d'hypothèse. -->
+
+```{r corrtestcomment, output='asis'}
+select_answer(r"-{
+[] -   La corrélation entre la hauteur et la circonférence n'est pas significative au seuil $\alpha$ de 5%. Les deux variables sont considérées comme non corrélées. La multicolinéarité n'est pas un problème ici
+[] -   La corrélation entre la hauteur et la circonférence est significative au seuil $\alpha$ de 5%. Cependant, le coefficient de corrélation est moyen, et la multicolinéarité n'est pas un problème ici.
+[] -   La corrélation entre la hauteur et la circonférence est significative au seuil $\alpha$ de 5%. Étant donné la valeur du coefficient de corrélation, nous devons nous méfier de la multicolinéarité dans le modèle.}-")
+```
+
+## Discussion et conclusions
+
+<!--% Ajoutez une phrase de conclusion ci-dessous qui donne une indication utile aux gardes forestiers par rapport à la question qu'ils se posent.-->
+
+...Votre discussion ici...
