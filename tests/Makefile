@@ -14,8 +14,6 @@ original :
 	echo "  • Élimination des versions compilées des documents Quarto..."
 	rm -f ../eucalyptus_notebook.html
 	rm -rf ../eucalyptus_notebook_files
-	rm -f ../critique.html
-	rm -rf ../critique_files
 	echo "  • Effacement des objets créés pour les tests..."
 	rm -rf results
 	rm -f .cnt
@@ -32,8 +30,6 @@ solution :
 	echo "  • Élimination des version compilées des documents Quarto..."
 	rm -f ../eucalyptus_notebook.html
 	rm -rf ../eucalyptus_notebook_files
-	rm -f ../critique.html
-	rm -rf ../critique_files
 	echo "  • Effacement des objets créés pour les tests..."
 	rm -rf results
 	rm -f .cnt
@@ -50,8 +46,6 @@ prepare :
 	echo "  • Élimination des versions compilées des documents Quarto..."
 	rm -f ../eucalyptus_notebook.html
 	rm -rf ../eucalyptus_notebook_files
-	rm -f ../critique.html
-	rm -rf ../critique_files
 	echo "  • Effacement des objets créés pour les tests..."
 	rm -rf results
 	rm -f .cnt

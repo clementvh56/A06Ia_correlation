@@ -35,7 +35,7 @@ Des gardes forestiers ont réalisé une série de mesures de hauteurs et de circ
 
 Les données sont mises à disposition par des gardes forestiers avec lesquels nous collaborons. Ces données ne sont pas publiques.
 
-L'analyse est réalisée avec le logiciel R (`r R.version.string`) et en particulier les packages {inferit} version `r packageVersion("inferit")` et {modelit} version `r packageVersion("modelit")` dans la [SciViews Box 2023](https://www.sciviews.org/software/svbox/). [Saturn Cloud](https://saturncloud.io/) (Linux Ubuntu 22.04) est utilisé pour exécuter le code et compiler la version HTML de ce bloc-notes.
+L'analyse est réalisée avec le logiciel R (`r R.version.string`) et en particulier les packages {inferit} version `r packageVersion("inferit")` et {modelit} version `r packageVersion("modelit")` dans la [SciViews Box 2024](https://www.sciviews.org/software/svbox/). [Saturn Cloud](https://saturncloud.io/) (Linux Ubuntu 22.04) est utilisé pour exécuter le code et compiler la version HTML de ce bloc-notes.
 
 Le seuil $\alpha$ du test est fixé à l'avance à 5%.
 
@@ -81,7 +81,7 @@ eucalyptus <- labelise(___,
 
 <!--% Réalisez un graphique adéquat pour représenter la hauteur des arbres en fonction de la circonférence. -->
 
-```{r plot, record='RNP', arg='labels'}
+```{r plot, record='RNCS'}
 ___(data = ___, ___) +
   ___
 ```

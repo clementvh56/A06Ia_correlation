@@ -1,8 +1,8 @@
-Package: A12Ia_correlation
+Package: A06Ia_correlation
 Type: Package
-Version: 2.0.0
-Title: Corrélation et critique statistique
-Description: Projet individuel cadré du module 12 du cours SDD I à l'UMONS
+Version: 3.0.0
+Title: Corrélation et test de corrélation
+Description: Projet individuel cadré du module 6 du cours SDD I à l'UMONS
 Authors@R: c(
   person("Guyliann", "Engels", role = c("aut", "cre"),
     email = "guyliann.engels@umons.ac.be",
@@ -11,10 +11,10 @@ Authors@R: c(
     email = "phgrosjean@sciviews.org",
     comment = c(ORCID = "0000-0002-2694-9471"))
   )
-Depends: R (>= 4.2.3)
-SystemRequirements: SciViews Box 2023 (https://www.sciviews.org/software/svbox/)
+Depends: R (>= 4.3.3)
+SystemRequirements: SciViews Box 2024 (https://www.sciviews.org/software/svbox/)
 License: CC BY-NC-SA 4.0
-URL: https://github.com/BioDataScience-Course/A12Ia_correlation
-BugReports: https://github.com/BioDataScience-Course/A12Ia_correlation/issues
+URL: https://github.com/BioDataScience-Course/A06Ia_correlation
+BugReports: https://github.com/BioDataScience-Course/A06Ia_correlation/issues
 Encoding: UTF-8
 Language: fr-FR
