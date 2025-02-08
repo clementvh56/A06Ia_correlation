@@ -1,6 +1,6 @@
 ---
 title: "Eucalyptus et corrélation"
-author: '___'
+author: 'Clément'
 date: "`r Sys.Date()`"
 format:
   html:
@@ -47,7 +47,7 @@ if (!"tools:tests" %in% search())
   source(here::here("tests/tools_tests.R"), attach(NULL, name = "tools:tests"))
 
 # Configuration de l'environnement SciViews::R
-___(___, ___ = "fr")
+SciViews::R("infer", lang = "fr")
 ```
 
 ### Analyse descriptive
@@ -55,17 +55,17 @@ ___(___, ___ = "fr")
 <!--% Importez le jeu de données `eucalyptus` qui se trouve dans le fichier eucalyptus.csv dans le dossier data. Utilisez ensuite la fonction `skim()` du package {skimr} pour décrire vos données. -->
 
 ```{r import, record='RODFS', object='eucalyptus'}
-eucalyptus <- ___(___)
-___(eucalyptus)
+eucalyptus <- read("./data/eucalyptus.csv")
+skimr::skim(eucalyptus)
 ```
 
 ```{r desccomment, output='asis'}
 select_answer(r"-{
-[] -   Ce jeu de données ne contient aucune valeur manquante.
+[x] -   Ce jeu de données ne contient aucune valeur manquante.
 [] -   Une valeur est manquante dans ce jeu de données.
 [] -   Plusieurs valeurs sont manquantes dans ce jeu de données.
 
-[] -   Ce tableau inclut uniquement des variables numériques.
+[x] -   Ce tableau inclut uniquement des variables numériques.
 [] -   Ce tableau comporte uniquement des variables qualitatives.
 [] -   Ce tableau contient des variables qualitatives et des variables quantitatives.}-")
 ```
@@ -73,33 +73,33 @@ select_answer(r"-{
 <!--% Ajoutez des labels et des unités aux variables `ht` et `circ`uniquement. La variable `ht` sera labellisée "Hauteur" en m. La variable `circ` sera labellisée "Circonférence à 1,5m" en cm. Vous enregistrerez le jeu de données labellisé sous le nom `eucalyptus`. -->
 
 ```{r labelise, record='RODFS', object='eucalyptus'}
-eucalyptus <- labelise(___,
-  label = list(___ = ___, ___ = ___),
-  units = list(___ = ___, ___ = ___)
+eucalyptus <- labelise(eucalyptus,
+  label = list(ht = "Hauteur", circ = "Circonférence à 1,5m"),
+  units = list(ht = "m", circ = "cm")
 )
 ```
 
 <!--% Réalisez un graphique adéquat pour représenter la hauteur des arbres en fonction de la circonférence. -->
 
 ```{r plot, record='RNCS'}
-___(data = ___, ___) +
-  ___
+chart(data = eucalyptus, ht ~ circ) +
+  geom_point()
 ```
 
 ```{r plotcomment, output='asis'}
 select_answer(r"-{
 [] -   Le nuage de points s'étire en oblique de manière parfaitement linéaire.
-[] -   Le nuage de points s'étire en oblique de façon à peu près linéaire.
+[x] -   Le nuage de points s'étire en oblique de façon à peu près linéaire.
 [] -   Le nuage de points s'étire en oblique de manière non linéaire.
 [] -   Le nuage de points s'étire presque parallèlement à l'axe des abscisses.
 [] -   Le nuage de points s'étire presque parallèlement à l'axe des ordonnées.
 
 [] -   La population est homogène.
-[] -   Des sous-groupes sont visibles sur le graphique.
+[x] -   Des sous-groupes sont visibles sur le graphique.
   
 [] -   Aucune valeur extrême ne se détache du nuage de points.
 [] -   Une valeur extrême se détache du nuage de points.
-[] -   Plusieurs valeurs extrêmes se détachent du nuage de points.}-")
+[x] -   Plusieurs valeurs extrêmes se détachent du nuage de points.}-")
 ```
 
 ### Corrélation entre hauteur et circonférence
@@ -109,7 +109,7 @@ La corrélation de Pearson entre hauteur et circonférence vaut :
 <!--% Calculez la corrélation linéaire de Pearson entre la hauteur et la circonférence des arbres en utilisant la fonction `cor()`. -->
 
 ```{r corrp, record='RN'}
-___(___)
+cor(eucalyptus$ht, eucalyptus$circ)
 ```
 
 Le coefficient de corrélation de Spearman entre les mêmes variables est :
@@ -117,19 +117,19 @@ Le coefficient de corrélation de Spearman entre les mêmes variables est :
 <!--% Calculez la corrélation non linéaire de Spearman entre la hauteur et la circonférence des arbres en utilisant la fonction `cor()` pour comparaison. -->
 
 ```{r corrs, record='RN'}
-___(___)
+cor(eucalyptus$ht, eucalyptus$circ, method = "spearman")
 ```
 
 ```{r corrcomment, output='asis'}
 select_answer(r"-{
-[] -   Les deux coefficients de corrélation sont proches l'un de l'autre, signe que le nuage de points est pratiquement linéaire.
+[x] -   Les deux coefficients de corrélation sont proches l'un de l'autre, signe que le nuage de points est pratiquement linéaire.
 [] -   Les deux coefficients de corrélation sont proches l'un de l'autre, la corrélation est donc significative.
 [] -   Les deux coefficients de corrélation sont très différents l'un de l'autre. Il y a non-linéarité.
 
 [] -   Les coefficients de corrélation sont pratiquement nuls.
 [] -   Les coefficients de corrélation sont faibles.
 [] -   Les coefficients de corrélation sont moyens.
-[] -   Les coefficients de corrélation sont élevés.
+[x] -   Les coefficients de corrélation sont élevés.
 [] -   Les coefficients de corrélation sont très élevés}-")
 ```
 
@@ -138,7 +138,7 @@ Cette corrélation est-elle significative ?
 <!--% Effectuez un test d'hypothèse pour déterminer si la corrélation selon Pearson est significative au seuil alpha de 5%. -->
 
 ```{r corrtest, record='RNP', arg='data.name,method,alternative,estimate'}
-___(data = ___, ___, alternative = ___)
+cor.test(data = eucalyptus,~ ht + circ, alternative = "two.sided" )
 ```
 
 <!-- Interprétez ce test d'hypothèse. -->
@@ -147,11 +147,11 @@ ___(data = ___, ___, alternative = ___)
 select_answer(r"-{
 [] -   La corrélation entre la hauteur et la circonférence n'est pas significative au seuil $\alpha$ de 5%. Les deux variables sont considérées comme non corrélées. La multicolinéarité n'est pas un problème ici
 [] -   La corrélation entre la hauteur et la circonférence est significative au seuil $\alpha$ de 5%. Cependant, le coefficient de corrélation est moyen, et la multicolinéarité n'est pas un problème ici.
-[] -   La corrélation entre la hauteur et la circonférence est significative au seuil $\alpha$ de 5%. Étant donné la valeur du coefficient de corrélation, nous devons nous méfier de la multicolinéarité dans le modèle.}-")
+[x] -   La corrélation entre la hauteur et la circonférence est significative au seuil $\alpha$ de 5%. Étant donné la valeur du coefficient de corrélation, nous devons nous méfier de la multicolinéarité dans le modèle.}-")
 ```
 
 ## Discussion et conclusions
 
 <!--% Ajoutez une phrase de conclusion ci-dessous qui donne une indication utile aux gardes forestiers par rapport à la question qu'ils se posent.-->
 
-...Votre discussion ici...
+Ok
